@@ -10,39 +10,55 @@ import git
 from codekit import codetools
 
 
-REPOS_DIR = './repos'
+REPOS_DIR = '../repos'
 gh = None
 
 
+def get_gh():
+    global gh
+    if not gh:
+        gh = codetools.login_github()
+    return gh
+
+
 def token():
-    if gh:
-        return gh.session.headers['Authorization'].split('token ')[1]
+    gh = get_gh()
+    return gh.session.headers['Authorization'].split('token ')[1]
 
 
-def update(github_repo, git_repo, branch_name, clone_dir):
+def add_file(git_repo, source, dest, file_name):
+    if not os.path.exists(dest):
+        shutil.copy(source, dest)
+        git_repo.index.add([file_name])
+        print('Add {0}'.format(file_name))
+        return True
+
+def update(git_repo, branch_name, clone_dir):
+    """Add setup.cfg and .travis.yml if they don't exist."""
     changed = False
-    dest_setup_cfg = os.path.join(clone_dir, 'files', 'setup.cfg')
-    dest_travis_yml = os.path.join(clone_dir, 'files', '.travis.yml')
+    source_setup_cfg = os.path.join('.', 'files', 'setup.cfg')
+    source_travis_yml = os.path.join('.', 'files', '.travis.yml')
+    dest_setup_cfg = os.path.join(clone_dir, 'setup.cfg')
+    dest_travis_yml = os.path.join(clone_dir, '.travis.yml')
     ticket_branch = git_repo.create_head(branch_name)
     ticket_branch.checkout()
-    if not os.path.exists(dest_travis_yml):
-        source_travis_yml = os.path.join('.', '.travis.yml')
-        shutil.copy(source_travis_yml, dest_travis_yml)
-        changed = True
-    else:
-        print('.travis.yml already exists in {0}/{1}'.format(
-            github_repo.owner.login, github_repo.name))
-    if not os.path.exists(dest_setup_cfg):
-        source_setup_cfg = os.path.join('.', 'setup.cfg')
-        shutil.copy(source_setup_cfg, dest_setup_cfg)
-        changed = True
-    else:
-        print('setup.cfg already exists in {0}/{1}'.format(
-            github_repo.owner.login, github_repo.name))
+    changed = add_file(git_repo, source_setup_cfg, dest_setup_cfg, 'setup.cfg')
+    changed = add_file(git_repo, source_travis_yml, dest_travis_yml, '.travis.yml') \
+              or changed
+    print("changed = " + str(changed))
     return changed
 
 
-def clone(github_repo, branch_name='master'):
+def pull_request(github_repo, branch_name):
+    return github_repo.create_pull(
+        title='[DM-9847] Add TravisCI and Flake8 configuration.',
+        base='master',
+        head=branch_name,
+        body='Add setup.cfg and .travis.yml to support TravisCI and'
+        ' Flake8 linting.')
+
+
+def clone(github_repo, branch_name='master', pull=False):
     clone_dir = os.path.join(REPOS_DIR, github_repo.name)
     if not os.path.exists(clone_dir):
         git_repo = git.Repo.clone_from(github_repo.clone_url,
@@ -51,16 +67,20 @@ def clone(github_repo, branch_name='master'):
         git_repo = git.Repo(clone_dir)
     print('Cloned {0}/{1}'.format(github_repo.owner.login,
                                   github_repo.name))
-    changed = update(github_repo, git_repo, branch_name, clone_dir)
-    if changed and git_repo.is_dirty():
-        git_repo.index.commit('[DM-9847] Add setup.cfg.')
+    changed = update(git_repo, branch_name, clone_dir)
+    if changed:
+        commit_message = '[DM-9847] Add TravisCI and Flake8 configuration.'
+        git_repo.index.commit(commit_message)
+        print('Add commit: {0}'.format(commit_message))
         remote = git_repo.remote(name='origin')
         refspec = 'refs/heads/{br}:refs/heads/{br}'.format(br=branch_name)
         # Do I need config writer bit?
-        remote.push(refspec=refspec)
-    else:
-        print('setup.cfg already exist in {0}/{1}'.format(
-            github_repo.owner.login, github_repo.name))
+        remote.push(refspec=refspec, force=True)
+        print(remote)
+        print(git_repo.working_dir)
+    if pull:
+        pr = pull_request(github_repo, branch_name)
+        print('Create pull request {0}'.format(pr))
 
 
 def travisci(github_repo):
@@ -77,6 +97,7 @@ def protect(github_repo, branch_name='master'):
 
 
 def get_repos(args):
+    gh = get_gh()
     repos = []
     if args.repo:
         repos.append(gh.repository(args.owner, args.repo))
@@ -92,29 +113,27 @@ def get_repos(args):
     return repos
 
 
-def main():
+def get_parser(description):
     parser = argparse.ArgumentParser(
-        description='Add TravisCI, protection and flake8 support.')
-    parser.add_argument('-b', '--branch_name',
-                        help='The branch name to use for clone and'
-                        ' pull requests.')
-    parser.add_argument('-c', '--clone', action='store_true',
-                        help='Add default setup.cfg and .travis.yml')
+        description=description)
     parser.add_argument('-f', '--file',
                         help='The file with a line delimited list of'
                         ' repository names.')
     parser.add_argument('-o', '--owner',
                         help='The GitHub owner or organization of the'
                         ' repository(ies).')
-    parser.add_argument('-p', '--protect', action='store_true',
-                        help='Add default branch protection')
     parser.add_argument('-r', '--repo',
                         help='The GitHub repository to apply to apply'
                         ' changes to.')
     parser.add_argument('-s', '--repos', nargs='+',
                         help='GitHub repositories to apply changes to.')
-    parser.add_argument('-t', '--travisci', action='store_true',
-                        help='Enable TravisCI webhook for repository(ies).')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Display additional information.')
+    return parser
+
+
+def main():
+    parser = get_parser('Add TravisCI, protection and flake8 support.')
     args = parser.parse_args()
     if args.file:
         repo_urls = open(args.file).read()
@@ -129,7 +148,7 @@ def main():
             if not args.branch_name:
                 raise Exception('A branch_name argument is required when'
                                 ' using clone.')
-            clone(r, args.branch_name)
+            clone(r, args.branch_name, args.pull)
         if args.protect:
             protect(r)
 
