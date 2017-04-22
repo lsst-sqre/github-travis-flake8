@@ -2,17 +2,10 @@
 """
 Command Line Interface to clone some repositories.
 """
-import argparse
-import os.path
-import shutil
-
-import git
-from codekit import codetools
-
-from base import get_parser, get_repos
-from travis import travis
-from protect import protect
-from update import clone
+from .base import get_parser, get_repos
+from .travis import travis
+from .protect import protect
+from .update import clone
 
 
 def main():

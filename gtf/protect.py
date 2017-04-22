@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from codekit import codetools
 
-from base import get_parser, get_repos, gh
+from base import get_parser, get_repos
 
 
 def protect(github_repo, branch_name='master', verbose=False):
