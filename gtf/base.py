@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Command Line Interface to clone some repositories.
 """
