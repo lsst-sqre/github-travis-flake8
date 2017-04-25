@@ -1,17 +1,15 @@
-# github-travis-flake8
+# sqre-gtf
 
-[![Build Status](https://travis-ci.org/lsst-sqre/github-travis-flake8.svg?branch=master)](https://travis-ci.org/lsst-sqre/github-travis-flake8)
+[![Build Status](https://travis-ci.org/lsst-sqre/sqre-gtf.svg?branch=master)](https://travis-ci.org/lsst-sqre/sqre-gtf)
 
-LSST DM SQuaRE TravisCI and Flake8 management scripts.
+Github TravisCI and Flake8 and update automation for LSST DM SQuaRE.
 
 ## Installation
 
-sqre-github-travis-flake8 runs on Python 2.7 or 3.6. You can install it with
+sqre-gtf runs on Python 2.7, 3.5 and 3.6. You can install it with
 
 ```bash
-pip install sqre-github-travis-flake8
+pip install sqre-gtf
 ```
 
-This will also install dependencies: `sqre-github3`, `urllib3`, `requests`, `progress` and `gitpython`.
-
-
+This will also install dependencies: `sqre-github3`, `sqre-codekit`, `progress` and `gitpython`.
