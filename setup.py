@@ -10,7 +10,7 @@ DESCRIPTION = 'GitHub Protection, TravisCI and Flake8 tools for LSST DM.'
 AUTHOR = 'J. Matt Peterson'
 AUTHOR_EMAIL = 'jmatt@jmatt.org'
 URL = 'https://github.com/lsst-sqre/gtf'
-VERSION = '0.1.9'
+VERSION = '0.1.13'
 LICENSE = 'MIT'
 
 
@@ -43,6 +43,9 @@ setup(
     ],
     keywords='lsst',
     packages=find_packages(exclude=['docs', 'tests*']),
+    package_dir={'': '.'},
+    package_data={'': 'files/*'},
+    include_package_data=True,
     install_requires=[
         'sqre-github3.py==1.0.0a4',
         'GitPython==1.0.1',
@@ -54,7 +57,6 @@ setup(
         'pytest==3.0.7',
         'pytest-cov==2.4.0',
         'pytest-flake8==0.8.1'],
-    include_package_data=True,
     entry_points={
         'console_scripts': [
             'github-update = gtf.cli.update:main',

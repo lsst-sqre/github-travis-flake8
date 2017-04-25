@@ -8,7 +8,7 @@ Github TravisCI and Flake8 and update automation for LSST DM SQuaRE.
 
 sqre-gtf runs on Python 2.7, 3.5 and 3.6. You can install it with
 
-```bash
+```
 pip install sqre-gtf
 ```
 
