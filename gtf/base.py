@@ -1,5 +1,4 @@
-"""
-Command Line Interface to clone some repositories.
+"""Base utility methods to automate Github, TravisCI and Flake8 changes.
 """
 import argparse
 import os
@@ -9,8 +8,9 @@ from codekit import codetools
 
 GTF_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 HOME_DIR = os.path.expanduser('~')
-REPOS_DIR = os.path.realpath(os.path.join(HOME_DIR, 'repos'))
-FILES_DIR = os.path.realpath(os.path.join(GTF_DIR_PATH, '..', 'files'))
+REPOS_DIR = os.path.realpath(os.path.join(HOME_DIR, 'sqre-repos'))
+FILES_DIR = os.path.realpath(os.path.join(GTF_DIR_PATH, 'files'))
+
 gh = None
 
 
