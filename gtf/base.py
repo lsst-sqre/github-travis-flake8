@@ -1,16 +1,19 @@
-"""
-Command Line Interface to clone some repositories.
+"""Base utility methods to automate Github, TravisCI and Flake8 changes.
 """
 import argparse
+import os
 
 from codekit import codetools
 
 
-REPOS_DIR = '../repos'
+GTF_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+HOME_DIR = os.path.expanduser('~')
+REPOS_DIR = os.path.realpath(os.path.join(HOME_DIR, 'sqre-repos'))
+FILES_DIR = os.path.realpath(os.path.join(GTF_DIR_PATH, 'files'))
 gh = None
 
 
-def get_gh():
+def _get_gh():
     global gh
     if not gh:
         gh = codetools.login_github()
@@ -18,13 +21,17 @@ def get_gh():
 
 
 def token():
-    gh = get_gh()
+    gh = _get_gh()
     return gh.session.headers['Authorization'].split('token ')[1]
 
 
 def get_repos(args):
-    gh = get_gh()
+    gh = _get_gh()
     repos = []
+    if args.repos_dir:
+        global REPOS_DIR
+        REPOS_DIR = os.path.realpath(os.path.expanduser(args.repos_dir))
+        os.makedirs(REPOS_DIR, exist_ok=True)
     if args.repo:
         repos.append(gh.repository(args.owner, args.repo))
     if args.repos:
@@ -48,6 +55,8 @@ def get_parser(description):
     parser.add_argument('-o', '--owner',
                         help='The GitHub owner or organization of the'
                         ' repository(ies).')
+    parser.add_argument('-d', '--repos_dir',
+                        help='The directory used to clone repositories into.')
     parser.add_argument('-r', '--repo',
                         help='The GitHub repository to apply to apply'
                         ' changes to.')
