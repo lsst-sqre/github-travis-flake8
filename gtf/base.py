@@ -10,6 +10,7 @@ GTF_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 HOME_DIR = os.path.expanduser('~')
 REPOS_DIR = os.path.realpath(os.path.join(HOME_DIR, 'sqre-repos'))
 FILES_DIR = os.path.realpath(os.path.join(GTF_DIR_PATH, 'files'))
+
 gh = None
 
 
