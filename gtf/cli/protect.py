@@ -4,7 +4,7 @@ from gtf.protect import protect
 
 
 def main():
-    parser = get_parser('Enable TravisCI webhook for repository(ies).')
+    parser = get_parser('Enable default Github branch protection.')
     parser.add_argument('-b', '--branch_name', default='master',
                         help='The branch name to protect. Defaults'
                         ' to master.')
