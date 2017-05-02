@@ -11,7 +11,11 @@ from . import tasks  # flake8: noqa: F401
 
 def _pull_request(github_repo, branch_name, pull_message, verbose):
     """Create a pull request."""
-    title, body = pull_message.split('\n', 1)
+    message = pull_message.split('\n', 1)
+    if len(message) == 1:
+        title = body = message[0]
+    else:
+        title, body = message
     try:
         pr = github_repo.create_pull(
             title=title,
