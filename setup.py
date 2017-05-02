@@ -10,7 +10,7 @@ DESCRIPTION = 'GitHub Protection, TravisCI and Flake8 tools for LSST DM.'
 AUTHOR = 'J. Matt Peterson'
 AUTHOR_EMAIL = 'jmatt@jmatt.org'
 URL = 'https://github.com/lsst-sqre/gtf'
-VERSION = '0.1.16'
+VERSION = '0.1.17'
 LICENSE = 'MIT'
 
 
