@@ -31,7 +31,7 @@ The following is an example that adds Github branch protection, enables TravisCI
 ```
 github-protect --owner lsst -repo utils --branch_name master
 github-travis --owner lsst --repo utils
-github-update --owner lsst --repo utils --task stack -branch_name tickets/DM-5637 --commit_message "[DM-5637] Add .travis.yml and setup.cfg to run flake8." --pull --pull_message "[DM-5637] Add .travis.yml and setup.cfg to run flake8."za
+github-update --owner lsst --repo utils --task stack -branch_name tickets/DM-5637 --commit_message "[DM-5637] Add .travis.yml and setup.cfg to run flake8." --pull --pull_message "[DM-5637] Add .travis.yml and setup.cfg to run flake8."
 ```
 
 ## LICENSE
